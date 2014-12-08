@@ -13,16 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# inherit from the proprietary version
--include vendor/lge/g3-common/BoardConfigVendor.mk
-
 LOCAL_PATH := device/lge/g3-common
 
 TARGET_SPECIFIC_HEADER_PATH := $(LOCAL_PATH)/include
-
-# Platform
-TARGET_BOARD_PLATFORM := msm8974
-TARGET_BOARD_PLATFORM_GPU := qcom-adreno330
 
 # CPU
 TARGET_ARCH := arm
@@ -46,53 +39,8 @@ BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
 BOARD_MKBOOTIMG_ARGS := --kernel_offset 0x0008000 --ramdisk_offset 0x2000000
 TARGET_KERNEL_SOURCE := kernel/lge/g3
-
-# Audio
-BOARD_USES_ALSA_AUDIO := true
-
-# Bluetooth
-BOARD_HAVE_BLUETOOTH := true
-
-# Camera
-USE_DEVICE_SPECIFIC_CAMERA := true
-COMMON_GLOBAL_CFLAGS += -DLG_CAMERA_HARDWARE
-COMMON_GLOBAL_CFLAGS += -DPROPERTY_PERMS_APPEND=' \
-    { "persist.data.sensor_name", AID_CAMERA, 0 }, \
-    { "camera.4k2k.enable", AID_MEDIA, 0 }, \
-    { "persist.data.rear.minfps", AID_MEDIA, 0 }, \
-    { "persist.data.front.minfps", AID_MEDIA, 0 }, \
-    '
-
-# CMHW
-BOARD_HARDWARE_CLASS := $(LOCAL_PATH)/cmhw/
-
-# Display
-BOARD_EGL_CFG := $(LOCAL_PATH)/configs/egl.cfg
-NUM_FRAMEBUFFER_SURFACE_BUFFERS := 3
-TARGET_USES_C2D_COMPOSITION := true
-TARGET_USES_ION := true
-USE_OPENGL_RENDERER := true
-
-MAX_EGL_CACHE_KEY_SIZE := 12*1024
-MAX_EGL_CACHE_SIZE := 2048*1024
-
-HAVE_ADRENO_SOURCE:= false
-OVERRIDE_RS_DRIVER:= libRSDriver_adreno.so
-
-# Fonts
-EXTENDED_FONT_FOOTPRINT := true
-
-# Lights
-TARGET_PROVIDES_LIBLIGHT := true
-
-# Logging
-TARGET_USES_LOGD=false
-
-# Media
-TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
-
-# NFC
-BOARD_NFC_CHIPSET := pn547
+#TARGET_KERNEL_APPEND_DTB := true
+BOARD_KERNEL_IMAGE_NAME := zImage-dtb
 
 # Offmode Charging
 COMMON_GLOBAL_CFLAGS += \
@@ -102,25 +50,15 @@ COMMON_GLOBAL_CFLAGS += \
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072
 
-# Power
-TARGET_POWERHAL_VARIANT := qcom
-
-# Qualcomm support
-COMMON_GLOBAL_CFLAGS += -DQCOM_BSP
-COMMON_GLOBAL_CFLAGS += -DQCOM_HARDWARE
-BOARD_USES_QCOM_HARDWARE := true
-TARGET_USES_QCOM_BSP := true
-
-# Recovery
-BOARD_HAS_NO_SELECT_BUTTON := true
-BOARD_RECOVERY_SWIPE := true
-BOARD_SUPPRESS_EMMC_WIPE := true
-BOARD_USE_CUSTOM_RECOVERY_FONT := \"roboto_23x41.h\"
-TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
+# TWRP
 TARGET_USERIMAGES_USE_EXT4 := true
+BOARD_HAS_NO_SELECT_BUTTON := true
+TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 
-# Radio
-BOARD_RIL_CLASS := ../../../device/lge/g3-common/ril/
-
-# Time services
-BOARD_USES_QC_TIME_SERVICES := true
+DEVICE_RESOLUTION := 1440x2560
+RECOVERY_GRAPHICS_USE_LINELENGTH := true
+TW_NO_USB_STORAGE := true
+#TW_INCLUDE_JB_CRYPTO := true
+BOARD_SUPPRESS_SECURE_ERASE := true
+RECOVERY_SDCARD_ON_DATA := true
+BOARD_HAS_NO_REAL_SDCARD := true
