@@ -62,6 +62,5 @@ TW_INCLUDE_L_CRYPTO := true
 BOARD_SUPPRESS_SECURE_ERASE := true
 RECOVERY_SDCARD_ON_DATA := true
 BOARD_HAS_NO_REAL_SDCARD := true
-TW_MAX_BRIGHTNESS := 255
 
 PRODUCT_COPY_FILES += device/lge/g3-common/recovery.fstab:recovery/root/etc/twrp.fstab
