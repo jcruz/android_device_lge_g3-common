@@ -7,6 +7,8 @@
 /efs1            emmc              /dev/block/platform/msm_sdcc.1/by-name/modemst1  flags=backup=1;display=EFS
 /efs2            emmc              /dev/block/platform/msm_sdcc.1/by-name/modemst2  flags=backup=1;subpartitionof=/efs1
 /radio           emmc              /dev/block/platform/msm_sdcc.1/by-name/modem     flags=backup=1;display=Modem
+/rpm             emmc              /dev/block/platform/msm_sdcc.1/by-name/rpm       flags=backup=1;subpartitionof=/radio
+/tz              emmc              /dev/block/platform/msm_sdcc.1/by-name/tz        flags=backup=1;subpartitionof=/radio
 
 /external_sd     vfat              /dev/block/mmcblk1p1  /dev/block/mmcblk1         flags=display="External SD"
 /usb-otg         vfat              /dev/block/sda1      /dev/block/sda              flags=removable;storage;display=USB-OTG
