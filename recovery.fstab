@@ -10,5 +10,5 @@
 /rpm             emmc              /dev/block/platform/msm_sdcc.1/by-name/rpm       flags=backup=1;subpartitionof=/radio
 /tz              emmc              /dev/block/platform/msm_sdcc.1/by-name/tz        flags=backup=1;subpartitionof=/radio
 
-/external_sd     vfat              /dev/block/mmcblk1p1  /dev/block/mmcblk1         flags=display="External SD"
-/usb-otg         vfat              /dev/block/sda1      /dev/block/sda              flags=removable;storage;display=USB-OTG
+/external_sd     vfat              /dev/block/mmcblk1p1  /dev/block/mmcblk1         flags=display="External SD";storage;wipeingui;removable
+/usb-otg         vfat              /dev/block/sda1      /dev/block/sda              flags=display=USB-OTG;storage;wipeingui;removable
