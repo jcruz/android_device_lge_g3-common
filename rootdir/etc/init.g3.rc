@@ -184,13 +184,9 @@ on boot
     chmod 0664 /sys/devices/platform/tspdrv/nforce_timed
     restorecon /sys/devices/platform/tspdrv/nforce_timed
 
-    # Display Color Calibration
-    chown root system /sys/devices/platform/kcal_ctrl.0/kcal
-    chown root system /sys/devices/platform/kcal_ctrl.0/kcal_ctrl
-    chmod 0664 /sys/devices/platform/kcal_ctrl.0/kcal
-    chmod 0664 /sys/devices/platform/kcal_ctrl.0/kcal_ctrl
-    restorecon /sys/devices/platform/kcal_ctrl.0/kcal
-    restorecon /sys/devices/platform/kcal_ctrl.0/kcal_ctrl
+    # Polynomial Color Correction
+    chown system system /sys/devices/virtual/graphics/fb0/rgb
+    chmod 0660 /sys/devices/virtual/graphics/fb0/rgb
 
     # led
     chown system system /sys/class/leds/button-backlight1/brightness
@@ -271,6 +267,7 @@ on boot
     chmod 664 /sys/devices/virtual/input/lge_touch/lpwg_data
     chown system radio /sys/devices/virtual/input/lge_touch/lpwg_notify
     chmod 664 /sys/devices/virtual/input/lge_touch/lpwg_notify
+    write /sys/devices/virtual/input/lge_touch/lpwg_notify "1 1 0 0"
     chown system system /sys/devices/virtual/input/lge_touch/lpwg_test_info
     chmod 644 /sys/devices/virtual/input/lge_touch/lpwg_test_info
     chown system system /sys/devices/virtual/input/lge_touch/lpwg_test_ctrl
@@ -536,11 +533,6 @@ service bt_hsic_control /system/bin/sh /system/etc/hsic.control.bt.sh
     user root
     disabled
 
-service bugreport /system/bin/bugmailer.sh -v
-    class main
-    disabled
-    oneshot
-
 service charger /sbin/charger_g3
     class charger
     critical
@@ -676,13 +668,6 @@ service hdmid /system/bin/hdmid
     socket hdmid stream 0660 root system graphics
     disabled
 
-service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
-    class late_start
-    user root
-    group root
-    oneshot
-    disabled
-
 service ims_regmanager /system/bin/exe-ims-regmanagerprocessnative
     class late_start
     group qcom_oncrpc net_bt_admin inet radio wifi
@@ -783,8 +768,7 @@ service mtsd /system/bin/mtsd
     socket mtsd.port stream 660 system system
 
 service netmgrd /system/bin/netmgrd
-    class main
-    disabled
+    class core
 
 service p2p_supplicant /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
@@ -854,11 +838,6 @@ service qcom-c_core-sh /system/bin/sh /init.galbi.class_core.sh
     user root
     oneshot
 
-service qcom-c_main-sh /system/bin/sh /init.galbi.class_main.sh
-    class main
-    user root
-    oneshot
-
 service qcom-sensor-sh /system/bin/sh /init.galbi-sensor.sh
     class main
     user root
@@ -876,10 +855,9 @@ service qmiproxy /system/bin/qmiproxy
     disabled
 
 service qmuxd /system/bin/qmuxd
-    class main
+    class core
     user radio
     group radio audio bluetooth gps qcom_diag
-    disabled
 
 service qosmgrd /system/bin/qosmgr /system/etc/qosmgr_rules.xml
    user system
@@ -902,14 +880,6 @@ service quipc_main /system/bin/quipc_main
     user gps
     group gps net_admin wifi inet
     disabled
-
-service ril-daemon1 /system/bin/rild -c 1
-    class main
-    socket rild1 stream 660 root radio
-    socket rild-debug1 stream 660 radio system
-    user root
-    disabled
-    group radio cache inet misc audio sdcard_r sdcard_rw qcom_oncrpc diag qcom_diag log net_raw
 
 service ril-qmi /system/bin/sh /init.galbi.ril.sh
     class main
@@ -949,10 +919,13 @@ service svelteoff /system/bin/logwrapper /system/bin/sh /system/etc/init.lge.sve
 	disabled
 	oneshot
 
-service thermal-engine /system/bin/thermal-engine
+service thermal-engine /system/bin/thermal-engine -c /system/etc/thermal-engine-8974.conf
    class main
    user root
    group root
+   socket thermal-send-client stream 0666 system system
+   socket thermal-recv-client stream 0660 system system
+   socket thermal-recv-passive-client stream 0666 system system
 
 service time_daemon /system/bin/time_daemon
    class late_start
@@ -1315,9 +1288,7 @@ on property:service.bootanim.exit=1
     chmod 664 /sys/devices/system/cpu/cpu1/online
     chmod 664 /sys/devices/system/cpu/cpu2/online
     chmod 664 /sys/devices/system/cpu/cpu3/online
-    write /dev/cpuctl/apps/cpu.notify_on_migrate "1"
 
-    write /sys/module/cpu_boost/parameters/boost_ms "20"
     write /sys/module/cpu_boost/parameters/sync_threshold "1728000"
     write /sys/module/cpu_boost/parameters/input_boost_freq "1497600"
     write /sys/module/cpu_boost/parameters/input_boost_ms "40"
@@ -1336,6 +1307,10 @@ on property:init.svc.bootanim=stopped
 
 # CM Performance Profiles
 on property:sys.perf.profile=0
+    stop mpdecision
+    write /sys/devices/system/cpu/cpu1/online 1
+    write /sys/devices/system/cpu/cpu2/online 1
+    write /sys/devices/system/cpu/cpu3/online 1
     write /sys/class/devfreq/qcom,cpubw.41/governor "powersave"
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor conservative
     write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor conservative
@@ -1345,7 +1320,11 @@ on property:sys.perf.profile=0
     start mpdecision
 
 on property:sys.perf.profile=1
-    write /sys/class/devfreq/qcom,cpubw.41/governor "msm_cpufreq"
+    stop mpdecision
+    write /sys/devices/system/cpu/cpu1/online 1
+    write /sys/devices/system/cpu/cpu2/online 1
+    write /sys/devices/system/cpu/cpu3/online 1
+    write /sys/class/devfreq/qcom,cpubw.41/governor "cpubw_hwmon"
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "interactive"
     write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor "interactive"
     write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "interactive"
@@ -1369,7 +1348,6 @@ on property:sys.perf.profile=1
 
 on property:sys.perf.profile=2
     stop mpdecision
-    write /sys/devices/system/cpu/cpu0/online 1
     write /sys/devices/system/cpu/cpu1/online 1
     write /sys/devices/system/cpu/cpu2/online 1
     write /sys/devices/system/cpu/cpu3/online 1
